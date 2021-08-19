@@ -5,13 +5,14 @@ from functools import reduce
 from operator import mul
 from datetime import datetime
 
+# Takes a set s and returns a powerset of s.
 def powerset(s):
     x = len(s)
     masks = [1 << i for i in range(x)]
     for i in range(1, 1 << x):
         yield [ss for mask, ss in zip(masks, s) if i & mask]
 
-# dumb lcm for list of arbitrary length
+# Finds the lcm of a set of arbitrary length. 
 def lcm(nums):
 	if not nums:
 		return 1
@@ -37,17 +38,14 @@ def mem_lucas(n, _cache={}):
 		return 2
 	return n
 
-def chunks(lst, n):
-	"""Yield successive n-sized chunks from lst."""
-	for i in range(0, len(lst), n):
-		yield lst[i:i + n]
-
+# Fermat base-2 pseudoprime test
 def b2Test(n):
 	fermat = pow(2, n-1, n)
 	if fermat == 1:
 		print("Base-2 Fermat Pseudoprime found at: ", n)
 	return [n, fermat]
 
+# much faster base-2 pseudoprime test
 def newb2Test(fibpsp, factors):
 	for factor in factors:
 		residue = fibpsp % (factor - 1)
@@ -71,6 +69,8 @@ def splitToMultiplicity(factors):
 	findLast = factors[-1][0] == 'P'
 	return (normFactors, findLast)
 
+# Finds the final prime factor of a fibonacci/lucas number. 
+# Refer to mersenneus for details on formatting.
 def getFinalPrime(n, factors):
 	nLCM = lcm(factors)
 	finalPrime = n // nLCM
@@ -78,10 +78,9 @@ def getFinalPrime(n, factors):
 		finalPrime //= math.gcd(nLCM, finalPrime)
 	return finalPrime
 
+# Parses factors of Lucas numbers
 def getLucas(): 
 	p = re.compile(r' +')
-
-	# Handle Lucas Factors
 
 	lucasFactors = [[-1, [], [], []] for i in range(10000)]
 	lucasFactors[0] = [0, [2], [], []]
@@ -136,10 +135,10 @@ def getLucas():
 				lucasFactors[L][1] = factors
 	return lucasFactors
 
+# Parses odd Fibonacci factors and constructs even Fibonnaci factors
 def getFibonacci():
 	p = re.compile(r' +')
 
-	# Handle Odd Fibonacci Factors
 	fibFactors = [[-1, []] for i in range(10000)]
 
 	fibFactors[0] = [0, []]
@@ -186,6 +185,8 @@ def getFibonacci():
 		fibFactors[i][1] = list(dict.fromkeys(factors))
 	return fibFactors
 
+# filters fibonacci factors into a sanitized array. 
+# Refer to readme for details on how this is done.
 def getSanitizedFactors():
 	fibFactors = getFibonacci()
 
@@ -195,9 +196,9 @@ def getSanitizedFactors():
 		sanitized[L] = [L, list(filter(lambda x: x % L == 1, fibFactors[L][1])), list(filter(lambda x: x % L == L - 1, fibFactors[L][1]))]
 	return sanitized
 
-sanitizedFactors = getSanitizedFactors() #list(chunks(getSanitizedFactors(), 100))
+sanitizedFactors = getSanitizedFactors() 
 
-#enumerate(sanitizedFactors[34:], 34) previously got to 7000
+# Construct & test fibonacci pseudoprimes.
 for index, [L, oneModFive, twoModFive] in enumerate(sanitizedFactors[0:], 0):
 	singletons = []
 	oddMults = []
