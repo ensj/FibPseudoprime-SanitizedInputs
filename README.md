@@ -32,7 +32,7 @@ Several things should be noted for `FibText.py` that weren't initially considere
 
 ## Contributing
 
-Currently, we see no relevant methods of contributing to this project. If you would like to contribute a significant change, contact [Junhyun Lim](limjunhyun@gmail.com) or [Shaunak Mashalkar] (ssmash724@gmail.com) to do so. 
+Currently, we see no relevant methods of contributing to this project. If you would like to contribute a significant change, contact Junhyun Lim (limjunhyun@gmail.com) or Shaunak Mashalkar (ssmash724@gmail.com) to do so. 
 
 ## License
 
