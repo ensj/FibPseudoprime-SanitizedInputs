@@ -12,9 +12,9 @@ The `/data` folder contains files used for our tests and verifications. The data
 
 `factors_final.txt` is the list of factors along with the index of the Fibonacci number from which they are derived. This file is used to generate possible Baillie-PSW pseudoprimes. It is an array of arrays containing the following: `[Index of fibonacci number L, [1 mod L factors], [-1 mod L factors]]`
 
-`fibFour.cpp` loops through odd numbers from 1 to 2n + 1, and runs a probabalistic primality test on each one to deduce if the number is prime (it's accurate up to 2^64, right?) If the number is prime, it then runs the same test for the corresponding Fibonacci number. If this number is composite, it is tested as a possible Baillie-PSW pseudoprime. 
+`fibFour.cpp` loops through odd numbers from 1 to 2n + 1, and runs a probabalistic primality test on each one to deduce if the number is prime. If the number is prime, it then runs the same test for the corresponding Fibonacci number. If this number is composite, it is tested as a possible Baillie-PSW pseudoprime. 
 
-`fibFive.cpp` loops through odd numbers from 1 to 2n + 1, and runs a probabalistic primality test on each one to deduce if the number is prime (it's accurate up to 2^64, right?) AND +/- 2 mod 5. If both conditions are met on a number 'p', the Fibonacci number with index '2p' is tested as a possible Baillie-PSW pseudoprime. 
+`fibFive.cpp` loops through odd numbers from 1 to 2n + 1, and runs a probabalistic primality test on each one to deduce if the number is prime AND +/- 2 mod 5. If both conditions are met on a number 'p', the Fibonacci number with index '2p' is tested as a possible Baillie-PSW pseudoprime. 
 
 ## Usage
 
