@@ -122,6 +122,12 @@ def getLucas():
 				else: 
 					currLucas = mem_lucas(L)
 
+				for i in range(len(factors)):
+					factoredLuc = currLucas // factors[i]
+					while (factoredLuc % factors[i] == 0):
+						factoredLuc = factoredLuc // factors[i]
+						factors.append(factors[i])
+
 				finalPrime = getFinalPrime(currLucas, factors)
 				if(finalPrime != 1):
 					factors.append(finalPrime)
@@ -162,6 +168,12 @@ def getFibonacci():
 
 			for factor in splitFactors[0]:
 				factors.append(factor)
+
+			for i in range(len(factors)):
+				factoredFib = fibn // factors[i]
+				while (factoredFib % factors[i] == 0):
+					factoredFib = factoredFib // factors[i]
+					factors.append(factors[i])
 
 			if (splitFactors[1]):
 				finalPrime = getFinalPrime(mem_fib(L), factors)
