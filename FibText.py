@@ -52,7 +52,6 @@ def newb2Test(fibpsp, factors):
 		fermat = pow(2, residue, factor)
 		if fermat != 2:
 			return False
-	print("b2 pseudoprime found at", fibpsp)
 	return True
 
 
@@ -82,29 +81,23 @@ def getFinalPrime(n, factors):
 def getLucas(): 
 	p = re.compile(r' +')
 
-	lucasFactors = [[-1, [], [], []] for i in range(10000)]
-	lucasFactors[0] = [0, [2], [], []]
-	lucasFactors[1] = [1, [], [], []]
+	lucasFactors = [[-1, []] for i in range(10000)]
+	lucasFactors[0] = [0, [2]]
+	lucasFactors[1] = [1, []]
 	with open("data/allLucasFactors.txt") as f:
 		for line in f:
 			rawtext = p.split(line)
 
 			L = int(re.findall(r'\d+', rawtext[0])[0])
-
 			factors = []
+
+			if L % 5 == 0:
+				continue
 
 			if (len(rawtext) > 2):
 				for ind in rawtext[1].strip('()').split(','):
 					if ind.isdigit():
-						for factor in lucasFactors[int(ind)][1] + lucasFactors[int(ind)][2] + lucasFactors[int(ind)][3]:
-							if factor not in factors:
-								factors.append(factor)
-					if ind[-1] == 'A':
-						for factor in lucasFactors[int(ind[:-1])][2]:
-							if factor not in factors:
-								factors.append(factor)
-					elif ind[-1] == 'B':
-						for factor in lucasFactors[int(ind[:-1])][3]:
+						for factor in lucasFactors[int(ind)][1]:
 							if factor not in factors:
 								factors.append(factor)
 
@@ -114,13 +107,7 @@ def getLucas():
 				factors.append(factor)
 
 			if (splitFactors[1]):
-				currLucas = -1
-				if (rawtext[0][-1] == 'A'):
-					currLucas = 5 * (mem_fib(L // 5) ** 2) - 5 * mem_fib(L // 5) + 1
-				elif (rawtext[0][-1] == 'B'):
-					currLucas = 5 * (mem_fib(L // 5) ** 2) + 5 * mem_fib(L // 5) + 1
-				else: 
-					currLucas = mem_lucas(L)
+				currLucas = mem_lucas(L)
 
 				for i in range(len(factors)):
 					factoredLuc = currLucas // factors[i]
@@ -131,21 +118,15 @@ def getLucas():
 				finalPrime = getFinalPrime(currLucas, factors)
 				if(finalPrime != 1):
 					factors.append(finalPrime)
-
-			if (rawtext[0][-1] == 'A'):
-				lucasFactors[L][2] = factors
-			elif (rawtext[0][-1] == 'B'):
-				lucasFactors[L][3] = factors
-			else:
-				lucasFactors[L][0] = L
-				lucasFactors[L][1] = factors
+			lucasFactors[L][0] = L
+			lucasFactors[L][1] = factors
 	return lucasFactors
 
 # Parses odd Fibonacci factors and constructs even Fibonnaci factors
 def getFibonacci():
 	p = re.compile(r' +')
 
-	fibFactors = [[-1, []] for i in range(10000)]
+	fibFactors = [[-1, []] for i in range(19999)]
 
 	fibFactors[0] = [0, []]
 	fibFactors[1] = [1, []]
@@ -155,6 +136,9 @@ def getFibonacci():
 		for i, line in enumerate(f):
 			L = i * 2 + 3
 			factors = []
+
+			if L % 5 == 0:
+				continue
 
 			rawtext = p.split(line)
 			if (len(rawtext) > 2):
@@ -181,20 +165,24 @@ def getFibonacci():
 					factors.append(finalPrime)
 
 			fibFactors[L][0] = L
-			fibFactors[L][1] = list(dict.fromkeys(factors))
+			fibFactors[L][1] = factors
 
 	lucasFactors = getLucas()
 
-	for i in range(4, 10000, 2):
+	for i in range(4, 19999, 2):
 		factors = []
 		L = i
+
+		if(L % 5 == 0):
+			continue
+
 		while(L % 2 == 0):
 			L //= 2
-			factors += lucasFactors[L][1] + lucasFactors[L][2] + lucasFactors[L][3]
+			factors += lucasFactors[L][1]
 		factors += fibFactors[L][1]
 
 		fibFactors[i][0] = i 
-		fibFactors[i][1] = list(dict.fromkeys(factors))
+		fibFactors[i][1] = factors
 	return fibFactors
 
 # filters fibonacci factors into a sanitized array. 
@@ -202,16 +190,22 @@ def getFibonacci():
 def getSanitizedFactors():
 	fibFactors = getFibonacci()
 
-	sanitized = [[-1, [], []] for i in range(10000)]
+	sanitized = [[-1, [], []] for i in range(19999)]
 
-	for L in range(10000):
+	for L in range(19999):
 		sanitized[L] = [L, list(filter(lambda x: x % L == 1, fibFactors[L][1])), list(filter(lambda x: x % L == L - 1, fibFactors[L][1]))]
 	return sanitized
 
 sanitizedFactors = getSanitizedFactors() 
 
 # Construct & test fibonacci pseudoprimes.
+length = 0
 for index, [L, oneModFive, twoModFive] in enumerate(sanitizedFactors[0:], 0):
+	if index%100 == 0:
+		print("Progress report: Done up to L=", index, "current # of psp=",length)
+	if(L == -1): 
+		continue
+
 	singletons = []
 	oddMults = []
 	for pset in powerset(twoModFive):
@@ -223,24 +217,22 @@ for index, [L, oneModFive, twoModFive] in enumerate(sanitizedFactors[0:], 0):
 	psp = []
 	for pset in powerset(oneModFive):
 		oneModMult = math.prod(pset)
-		pset.append(1)
-		for single in singletons:
-			psp.append(single * oneModMult)
-			pset[-1] = single
-			newb2Test(psp[-1], pset)
-
-		pset.pop()
 
 		for oddMult in oddMults:
 			psp.append(math.prod(oddMult) * oneModMult)
 			newb2Test(psp[-1], oddMult + pset)
 
+		for single in singletons:
+			psp.append(single * oneModMult)
+			if(newb2Test(psp[-1], pset + [single])):
+				b2Test(psp[-1])
+
 	for oddMult in oddMults:
 		psp.append(math.prod(oddMult))
-		newb2Test(psp[-1], oddMult + pset)
+		if(newb2Test(psp[-1], oddMult + pset)):
+					b2Test(psp[-1])
 
-	if index%100 == 0:
-		print("Process done for L=", index)
+	length += len(psp)
 
 
 
